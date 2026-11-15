@@ -129,7 +129,7 @@ public class User_Story_2 extends JFrame {
 					frame.toFront();
 					frame.requestFocus();
 				} else if (choice == 1) {
-					// No: add your behaviour here
+					// added in user story 3
 				}
 			}
 		});
