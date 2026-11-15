@@ -1,0 +1,237 @@
+package press.on.nails;
+
+import java.awt.EventQueue;
+
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.*;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import java.io.*;
+import java.util.ArrayList;
+import javax.swing.*;
+import java.awt.event.*;
+
+public class User_Story_3 extends JFrame {
+
+	private JFrame frame;
+	private JTextField textField;
+
+	private JButton checkout;
+
+	private ArrayList<String> cart = new ArrayList<>();   // stores each selected design
+
+	private int purchaseCount = 0;
+	private static final int MAX_PURCHASES = 3;
+
+	//launch the new application
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					User_Story_3 window = new User_Story_3();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	//creating the application, i.e. the interactable window pane
+	public User_Story_3() {
+		initialize();
+	}
+
+
+	//initialise the contents of the JFrame
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 450, 340);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+
+		//Label at the top of the screen
+		JLabel lblNewLabel = new JLabel("Select Your Designs!!");
+		lblNewLabel.setFont(new Font("Arial", Font.BOLD, 18));
+		lblNewLabel.setBounds(42, 11, 198, 30);
+		frame.getContentPane().add(lblNewLabel);
+
+		//try to insert images into java window
+		JLabel lblNewLabel_1 = new JLabel("");
+		Image img = new ImageIcon(this.getClass().getResource("/halloween nails.jpg")).getImage();
+		lblNewLabel_1.setIcon(new ImageIcon(img));
+		lblNewLabel_1.setBounds(42, 62, 210, 175);
+		frame.getContentPane().add(lblNewLabel_1);
+
+		JLabel lblNewLabel_2 = new JLabel("");
+		Image img1 = new ImageIcon(this.getClass().getResource("/yellow nails.jpg")).getImage();
+		lblNewLabel_2.setIcon(new ImageIcon(img1));
+		lblNewLabel_2.setBounds(276, 151, 115, 101);
+		frame.getContentPane().add(lblNewLabel_2);
+
+		JLabel lblNewLabel_3 = new JLabel("");
+		Image img2 = new ImageIcon(this.getClass().getResource("/pink nails.jpg")).getImage();
+		lblNewLabel_3.setIcon(new ImageIcon(img2));
+		lblNewLabel_3.setBounds(276, 50, 115, 101);
+		frame.getContentPane().add(lblNewLabel_3);
+
+		//JComboBox + array of nail design options and prices
+		String designs[] = {"halloween ($40)", "pink ($30)", "yellow($30)"};
+
+		JComboBox<String> comboBox = new JComboBox<>(designs);
+		comboBox.setToolTipText("");
+		comboBox.setBounds(266, 17, 107, 22);
+		frame.getContentPane().add(comboBox);
+
+		//Checkout button
+		checkout = new JButton("Checkout");
+		checkout.setBounds(42, 255, 120, 30);
+		frame.getContentPane().add(checkout);
+
+		checkout.addActionListener(e -> openCheckoutWindow());
+
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				// Block the purchase if the limit has already been reached
+				if (purchaseCount >= MAX_PURCHASES) {
+					JOptionPane.showMessageDialog(frame,
+							"You have exceeded your weekly purchase limit.",
+							"Purchase Limit Reached",
+							JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+
+				// Count this selection
+				purchaseCount++;
+
+				String selected = (String) comboBox.getSelectedItem();
+				cart.add(selected);
+
+				Object[] options = {"Yes", "No"};
+				int choice = JOptionPane.showOptionDialog(
+						frame,
+						"You have selected the following set: " + selected
+								+ "\nSets selected: " + purchaseCount + " of " + MAX_PURCHASES
+								+ "\nContinue shopping?",
+						"Design Selected",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE,
+						null,
+						options,
+						options[0]);
+
+				if (choice == 0) {
+					// Yes: back to the original JFrame
+					frame.toFront();
+					frame.requestFocus();
+				} else if (choice == 1) {
+					int proceed = JOptionPane.showConfirmDialog(
+							frame,
+							"Proceed to checkout?",
+							"Checkout",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE);
+
+					if (proceed == JOptionPane.YES_OPTION) {
+						openCheckoutWindow();   // opens the checkout window
+					}
+				}
+			}
+		});
+
+	}
+
+	//opens the checkout window: order summary + delivery address
+	private void openCheckoutWindow() {
+		if (cart.isEmpty()) {
+			JOptionPane.showMessageDialog(frame,
+					"Your basket is empty. Please select a design first.",
+					"Empty Basket",
+					JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+
+		// Build the order summary
+		int total = 0;
+		StringBuilder summary = new StringBuilder("Your order:\n");
+		for (String item : cart) {
+			summary.append("  - ").append(item).append("\n");
+			total += getPrice(item);
+		}
+		summary.append("\nTotal: $").append(total);
+
+		// Modal dialog, so the main window is locked until this one is closed
+		JDialog dialog = new JDialog(frame, "Confirm Your Order", true);
+		dialog.setSize(400, 350);
+		dialog.setLocationRelativeTo(frame);
+		dialog.setLayout(new BorderLayout(10, 10));
+
+		// Order summary at the top
+		JTextArea summaryArea = new JTextArea(summary.toString());
+		summaryArea.setEditable(false);
+		summaryArea.setFont(new Font("Arial", Font.PLAIN, 14));
+		summaryArea.setMargin(new Insets(10, 10, 10, 10));
+		dialog.add(summaryArea, BorderLayout.NORTH);
+
+		// Single address box in the middle
+		JTextArea addressField = new JTextArea(4, 20);
+		addressField.setLineWrap(true);
+		addressField.setWrapStyleWord(true);
+
+		JPanel form = new JPanel(new BorderLayout());
+		form.setBorder(BorderFactory.createTitledBorder("Delivery Address"));
+		form.add(new JScrollPane(addressField), BorderLayout.CENTER);
+		dialog.add(form, BorderLayout.CENTER);
+
+		// Buttons at the bottom
+		JButton confirm = new JButton("Confirm Order");
+		JButton cancel = new JButton("Cancel");
+		JPanel buttons = new JPanel();
+		buttons.add(confirm);
+		buttons.add(cancel);
+		dialog.add(buttons, BorderLayout.SOUTH);
+
+		confirm.addActionListener(e -> {
+			String address = addressField.getText().trim();
+
+			if (address.isEmpty()) {
+				JOptionPane.showMessageDialog(dialog,
+						"Please enter your delivery address.",
+						"Missing Information",
+						JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+
+			JOptionPane.showMessageDialog(dialog,
+					"Thank you! Your order has been confirmed.\n"
+							+ "It will be delivered to:\n" + address,
+					"Order Confirmed",
+					JOptionPane.INFORMATION_MESSAGE);
+
+			cart.clear();       // basket is emptied once the order is placed
+			dialog.dispose();   // closes the checkout window
+		});
+
+		cancel.addActionListener(e -> dialog.dispose());   // back to the main window, basket kept
+
+		dialog.setVisible(true);
+	}
+
+	//pulls the price out of a string like "halloween ($40)"
+	private int getPrice(String item) {
+		int start = item.indexOf('$');
+		int end = item.indexOf(')');
+		return Integer.parseInt(item.substring(start + 1, end));
+	}
+
+}
