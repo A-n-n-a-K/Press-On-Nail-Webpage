@@ -1,0 +1,139 @@
+package press.on.nails;
+
+import java.awt.EventQueue;
+
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.*;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import java.io.*;
+import java.util.ArrayList;
+import javax.swing.*;
+import java.awt.event.*;
+
+public class User_Story_2 extends JFrame {
+
+	private JFrame frame;
+	private JTextField textField;
+	
+	private JButton Yes;
+	private JButton No;
+	private JButton checkout;
+	
+	private int purchaseCount = 0;
+	private static final int MAX_PURCHASES = 3;
+
+	//launch the new application
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					User_Story_2 window = new User_Story_2();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	//creating the application, i.e. the interactable window pane
+	public User_Story_2() {
+		initialize();
+	}
+
+
+	//initialise the contents of the JFrame
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 450, 300);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+		
+		//Label at the top of the screen
+		JLabel lblNewLabel = new JLabel("Select Your Designs!!");
+		lblNewLabel.setFont(new Font("Arial", Font.BOLD, 18));
+		lblNewLabel.setBounds(42, 11, 198, 30);
+		frame.getContentPane().add(lblNewLabel);
+		
+		//try to insert images into java window
+		JLabel lblNewLabel_1 = new JLabel("");
+		Image img = new ImageIcon(this.getClass().getResource("/halloween nails.jpg")).getImage();
+		lblNewLabel_1.setIcon(new ImageIcon(img));
+		lblNewLabel_1.setBounds(42, 62, 210, 175);
+		frame.getContentPane().add(lblNewLabel_1);
+		
+		JLabel lblNewLabel_2 = new JLabel("");
+		Image img1 = new ImageIcon(this.getClass().getResource("/yellow nails.jpg")).getImage();
+		lblNewLabel_2.setIcon(new ImageIcon(img1));
+		lblNewLabel_2.setBounds(276, 151, 115, 101);
+		frame.getContentPane().add(lblNewLabel_2);
+		
+		JLabel lblNewLabel_3 = new JLabel("");
+		Image img2 = new ImageIcon(this.getClass().getResource("/pink nails.jpg")).getImage();
+		lblNewLabel_3.setIcon(new ImageIcon(img2));
+		lblNewLabel_3.setBounds(276, 50, 115, 101);
+		frame.getContentPane().add(lblNewLabel_3);
+		
+		//JComboBox + array of nail design options and prices
+		String designs[] = {"halloween ($40)", "pink ($30)", "yellow($30)"};
+		
+		JComboBox<String> comboBox = new JComboBox<>(designs);
+		comboBox.setToolTipText("");
+		comboBox.setBounds(266, 17, 107, 22);
+		frame.getContentPane().add(comboBox);
+		
+		//String selected = (String) comboBox.getSelectedItem();
+		
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				// Block the purchase if the limit has already been reached
+				if (purchaseCount >= MAX_PURCHASES) {
+					JOptionPane.showMessageDialog(frame,
+							"You have exceeded your weekly purchase limit.",
+							"Purchase Limit Reached",
+							JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+
+				// Count this selection
+				purchaseCount++;
+
+				String selected = (String) comboBox.getSelectedItem();
+
+				Object[] options = {"Yes", "No"};
+				int choice = JOptionPane.showOptionDialog(
+						frame,
+						"You have selected the following set: " + selected
+								+ "\nSets selected: " + purchaseCount + " of " + MAX_PURCHASES
+								+ "\nContinue shopping?",
+						"Design Selected",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE,
+						null,
+						options,
+						options[0]);
+
+				if (choice == 0) {
+					// Yes: back to the original JFrame
+					frame.toFront();
+					frame.requestFocus();
+				} else if (choice == 1) {
+					// No: add your behaviour here
+				}
+			}
+		});
+		
+	}
+	
+}
